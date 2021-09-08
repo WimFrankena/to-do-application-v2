@@ -28,8 +28,7 @@ public class ToDoResource {
         Optional<ToDo> todoFound = todos.stream().filter(todo -> todo.getId().equals(id))
                 .findFirst();
         if (todoFound.isPresent()) {
-            return Response.ok(todos.stream().filter(todo -> todo.getId().equals(id))
-                    .findFirst()).build();
+            return Response.ok(todoFound).build();
         }
         /*return Response.status(Response.Status.BAD_REQUEST).build();*/
         return Response.status(Response.Status.NOT_FOUND).build();
