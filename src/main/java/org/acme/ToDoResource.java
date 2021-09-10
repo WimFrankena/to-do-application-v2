@@ -32,7 +32,7 @@ public class ToDoResource {
         }
         /*return Response.status(Response.Status.BAD_REQUEST).build();*/
         return Response.status(Response.Status.NOT_FOUND).build();
-            }
+    }
 
 
     @GET
@@ -78,7 +78,7 @@ public class ToDoResource {
             removed = todos.remove(todoToDelete.get());
         }
         if (removed) {
-            return Response.noContent().build();
+            return Response.ok("Deletion successful").build();
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
