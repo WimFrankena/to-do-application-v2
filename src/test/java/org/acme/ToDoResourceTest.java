@@ -19,7 +19,8 @@ public class ToDoResourceTest {
         ToDo newTodo = new ToDo();
         newTodo.setName("Example Name");
         newTodo.setDescription("Example Description");
-        newTodo.setId(10L);
+        newTodo.setId();
+        //newTodo.setId(10L);
         ObjectMapper mapper = new ObjectMapper();
         given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
                 .body(mapper.writeValueAsString(newTodo))
@@ -42,12 +43,13 @@ public class ToDoResourceTest {
                 //.body(is("[]"));
                 .body("", hasSize(0));
         testCreate();
+        //testCreate(); when creating a second object it is autoIncrementing the Id as expected.
         given().contentType(ContentType.JSON)
                 .when().get("/todos")
                 .then()
                 .statusCode(200).assertThat()
                 .body("", hasSize(1))
-                .body("id",hasItem(10),
+                .body("id",hasItem(1000),
                         "description",hasItem("Example Description"),
                         "name",hasItem("Example Name"));
     }
@@ -57,7 +59,7 @@ public class ToDoResourceTest {
     public void testDelete() throws JsonProcessingException {
         testCreate();
         given().contentType(ContentType.JSON)
-                .when().delete("/todos/10")
+                .when().delete("/todos/1000")
                 .then()
                 .statusCode(200)
                 .body(is("Deletion successful"));
