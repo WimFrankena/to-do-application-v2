@@ -1,76 +1,82 @@
 package org.acme;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.junit.QuarkusTest;
-import static io.restassured.RestAssured.given;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
 
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasSize;
 
 @QuarkusTest
 public class ToDoResourceTest {
 
-    /*@BeforeEach
-    public void createTestToDo() {
+    @Test
+    public void testCreate() throws JsonProcessingException {
         ToDo newTodo = new ToDo();
         newTodo.setName("Example Name");
         newTodo.setDescription("Example Description");
-        newTodo.setId((long) 10);
-    }*/
-
-    /*@AfterEach
-    public void after() {
-        deleteTodo(id);
-    }*/
-
-    /* Failing because I escape the string to pass the*/
-
-    @Test
-    public void testCreate() {
-        given()
-                .body("{\"id\": \"1\", \"name\": \"toDoOne\",\"description\": \"Test case\"}")
-                .header("Content-Type", MediaType.APPLICATION_JSON)
+        newTodo.setId(10L);
+        ObjectMapper mapper = new ObjectMapper();
+        given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                .body(mapper.writeValueAsString(newTodo))
                 .when()
                 .post("/todos")
-                .then()
-                .statusCode(200)
-                .body("$.size()", is(1),
-                        "name", containsInAnyOrder("toDoOne"),
-                        "description", containsInAnyOrder("Test case"));
+                .then().contentType(ContentType.JSON).extract().response();
+                /*.body("name", equals(newTodo.getName()),"description", equals(newTodo.getDescription()));*/
+                /*.body("$.size()", is(1),
+                        "name", CoreMatchers.is("Example Name"),
+                        "description", CoreMatchers.is("Example Description"));*/
+
     }
 
     @Test
-    public void testGetTodos() {
-        given()
+    public void testGetTodos() throws JsonProcessingException {
+        given().contentType(ContentType.JSON)
                 .when().get("/todos")
                 .then()
-                .statusCode(200);
-                 /*Fix after data loading
-                .body(containsString("Test Case"));
-                .body("id",equalTo(1)
-                .body("description",equalTo("Test case")
-                .body("name",equalTo("toDoOne");*/
+                .statusCode(200).assertThat()
+                //.body(is("[]"));
+                .body("", hasSize(0));
+        testCreate();
+        given().contentType(ContentType.JSON)
+                .when().get("/todos")
+                .then()
+                .statusCode(200).assertThat()
+                .body("", hasSize(1))
+                .body("id",hasItem(10),
+                        "description",hasItem("Example Description"),
+                        "name",hasItem("Example Name"));
     }
 
+
     @Test
-    public void testDelete() {
-        given()
-                .when().delete("1")
+    public void testDelete() throws JsonProcessingException {
+        testCreate();
+        given().contentType(ContentType.JSON)
+                .when().delete("/todos/10")
                 .then()
-                .statusCode(404);
-                /* Fix after data loading then change status code to 200
                 .statusCode(200)
-                .body(is("Deletion Successful"));*/
+                .body(is("Deletion successful"));
     }
+
+    /*@Test
+    public void testDeleteJsonPath() throws JsonProcessingException {
+        testCreate();
+        Response response = (Response) given();
+        given().contentType(ContentType.JSON)
+                .when().delete("/todos/10")
+                .then();
+                //.body(is("Deletion successful"));
+        *//*.statusCode(404);*//*
+        *//* Fix after data loading then change status code to 200*//*
+        //JsonPath jp = new JsonPath("$.body",containsString("Deletion successful"));
+                    *//*JsonPath jp = new JsonPath(response.toString());
+                    System.out.println(jp);*//*
+                    *//*.statusCode(200)
+                    .body(ApiBody)*//*
+    }*/
 }

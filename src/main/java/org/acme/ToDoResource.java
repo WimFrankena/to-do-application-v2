@@ -1,6 +1,8 @@
 package org.acme;
 
 
+import org.jboss.resteasy.annotations.Body;
+
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -51,20 +53,21 @@ public class ToDoResource {
     }
 
     @PUT
-    @Path("{id}/{name}")
+    @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response updateTodo(
             @PathParam("id") Long id,
-            @PathParam("name") String name) {
-        todos = todos.stream().map(todo -> {
-            if(todo.getId().equals(id)) {
-                todo.setName(name);
-            }
-            return todo;
-        }).collect(Collectors.toList());
-        return Response.ok(todos).build();
+            ToDo toDoToBeUpdated) {
+        Optional<ToDo> updatedToDo = todos.stream().filter(todo -> id.equals(todo.getId())).findFirst();
+        if (updatedToDo.isEmpty())
+            return Response.status(Response.Status.NOT_FOUND).build();
+        ToDo updateToDo = updatedToDo.get();
+        updateToDo.setName(toDoToBeUpdated.getName());
+        updateToDo.setDescription(toDoToBeUpdated.getDescription());
+        return Response.ok(updateToDo).build();
     }
+
 
     @DELETE
     @Path("{id}")
