@@ -49,7 +49,7 @@ public class ToDoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTodo(ToDo newTodo) {
         todos.add(newTodo);
-        return Response.ok(todos).build();
+        return Response.ok(newTodo).build();
     }
 
     @PUT
