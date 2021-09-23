@@ -13,7 +13,8 @@ import java.util.stream.Collectors;
 
 @Path("/todos")
 public class ToDoResource {
-
+    ToDoService service = new ToDoService();
+    // check for injection quarkus
     public static List<ToDo> todos = new ArrayList<>();
 
 
@@ -48,7 +49,7 @@ public class ToDoResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTodo(ToDo newTodo) {
-        todos.add(newTodo);
+        newTodo = service.createToDo(newTodo);
         return Response.ok(newTodo).build();
     }
 
@@ -65,6 +66,7 @@ public class ToDoResource {
         ToDo updateToDo = updatedToDo.get();
         updateToDo.setName(toDoToBeUpdated.getName());
         updateToDo.setDescription(toDoToBeUpdated.getDescription());
+        updateToDo.setTasks(toDoToBeUpdated.getTasks());
         return Response.ok(updateToDo).build();
     }
 
