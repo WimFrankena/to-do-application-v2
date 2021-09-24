@@ -22,7 +22,7 @@ public class ToDoResourceTest {
         // the .body part of the test fails in the later test instances because it's not equal to 1000 anymore
         // have to find a way to set this dynamically OR remove the body part of test when creating objects.
         ToDo newTodo = new ToDo();
-        newTodo.setName("Example Name");
+        //newTodo.setName("Example Name");
         newTodo.setDescription("Example Description");
         newTodo.setId();
         ObjectMapper mapper = new ObjectMapper();

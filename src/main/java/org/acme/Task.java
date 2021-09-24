@@ -1,10 +1,12 @@
 package org.acme;
 
+import javax.validation.constraints.NotEmpty;
+
 import static java.util.Objects.requireNonNull;
 
 public class Task {
     private Long id;
-    private String name;
+    @NotEmpty private String name;
     private String description;
 
 
@@ -23,7 +25,7 @@ public class Task {
     }
 
     public void setName(String name) {
-        this.name = requireNonNull(name);
+        this.name = name;
     }
 
     public String getDescription() {

@@ -1,7 +1,9 @@
 package org.acme;
 import org.gradle.internal.impldep.org.apache.commons.lang.ArrayUtils;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +15,7 @@ import static java.util.Objects.requireNonNull;
 public class ToDo {
 
     private Long id;
-    private String name;
+    @NotEmpty private String name;
     private String description;
     private Task[] tasks;
     //private List<Task> tasks;
@@ -38,9 +40,8 @@ public class ToDo {
         return name;
     }
 
-    @NotBlank(message = "Name may not be blank")
     public void setName(String name) {
-        this.name = requireNonNull(name);
+        this.name = name;
     }
 
     public String getDescription() {
