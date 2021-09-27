@@ -1,17 +1,12 @@
 package org.acme;
 
 
-import org.jboss.resteasy.annotations.Body;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Path("/todos")
 public class ToDoResource {
@@ -75,8 +70,8 @@ public class ToDoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteTodo(
             @PathParam("id") Long id) {
-        Optional<ToDo> toDoDeleted = service.deleteToDo(id);
-        if (toDoDeleted == null) {
+        ToDo toDoDeleted = service.deleteToDo(id);
+        if (toDoDeleted.getId() == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok("Deletion successful").build();

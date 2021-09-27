@@ -1,12 +1,8 @@
 package org.acme;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
+
 import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static java.util.Objects.requireNonNull;
 
@@ -24,14 +20,6 @@ public class ToDo {
     }
 
     public void setTasks(List<Task> tasks) {
-        /*if(!this.tasks.isEmpty()) {
-            for(Task task:tasks) {
-                this.tasks.add(task);
-            }
-        } else
-            {
-                this.tasks = tasks;
-            }*/
         this.tasks = tasks;
     }
 

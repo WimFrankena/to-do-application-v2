@@ -1,8 +1,7 @@
 package org.acme;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,14 +45,14 @@ public class ToDoService {
         return returnUpdatedToDo;
     }
 
-    public Optional<ToDo> deleteToDo(Long id) {
-        Optional<ToDo> toDoToDelete = getToDos().stream().filter(todo -> todo.getId().equals(id))
-                .findFirst();
+    public ToDo deleteToDo(Long id) {
+        ToDo deletedToDo = new ToDo();
+        Optional<ToDo> toDoToDelete = getToDo(id);
         boolean removeToDo = false;
         if (toDoToDelete.isPresent()) {
+            deletedToDo = toDoToDelete.get();
             removeToDo = getToDos().remove(toDoToDelete.get());
-            return toDoToDelete;
         }
-        return null;
+        return deletedToDo;
     }
 }
