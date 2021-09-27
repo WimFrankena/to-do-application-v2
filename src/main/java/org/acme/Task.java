@@ -8,6 +8,7 @@ public class Task {
     private Long id;
     @NotEmpty private String name;
     private String description;
+    //add status
 
 
     public Long getId() {

@@ -4,58 +4,86 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.junit.QuarkusTest;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.equalTo;
 
 @QuarkusTest
 public class ToDoResourceTest {
 
-    @Test
-    public void testCreate() throws JsonProcessingException {
-        // I think I can do this smarter by extending this class and calling createTodo
-        // from ToDoResource.java (later from ToDoService)
-        // the .body part of the test fails in the later test instances because it's not equal to 1000 anymore
-        // have to find a way to set this dynamically OR remove the body part of test when creating objects.
-        ToDo newTodo = new ToDo();
-        newTodo.setName("Example Name");
-        newTodo.setDescription("Example Description");
-        newTodo.generateId();
-        // create task(s)
+    // set up @beforeEach and @After with createTestToDo to create sterile test results
+    @BeforeEach
+    public void createTestToDo() throws JsonProcessingException {
+        ToDo newToDo = new ToDo();
+        newToDo.setName("Example Name");
+        newToDo.setDescription("Example Description");
+        // Create task(s) with newToDo
         ObjectMapper mapper = new ObjectMapper();
-        given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
-                .body(mapper.writeValueAsString(newTodo))
+        ToDo extractedToDo = given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                .body(mapper.writeValueAsString(newToDo))
                 .when()
                 .post("/todos")
-                .then().statusCode(200);
-        // could now switch to equalTo because POST /todos returns only the created object, not the list.
-        // however this breaks my tests, see above
-                /*.body("id",equalTo(1000),
-                        "description",equalTo("Example Description"),
-                        "name",equalTo("Example Name"));*/
+                .then().statusCode(200)
+                .extract()
+                .as(ToDo.class);
+        assertThat(extractedToDo.getId(),equalTo(1000L));
+    }
+
+    @AfterEach
+    // Doesn't seem to delete properly as the expected values iterate continuously..
+    // More likely: the application doesn't stop iterating because it's not fetching the latest ID..
+    public void deleteTestToDo(){
+        given().contentType(ContentType.JSON)
+                .when().delete("/todos/1001")
+                .then();
+    }
+
+    @Test
+    public void testCreate() throws JsonProcessingException {
+        // I think I can do this smarter by calling createToDo from ToDoService
+        ToDo newToDo = new ToDo();
+        newToDo.setName("Example Name");
+        newToDo.setDescription("Example Description");
+        // Create task(s) with newToDo
+        ObjectMapper mapper = new ObjectMapper();
+        ToDo extractedToDo = given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                .body(mapper.writeValueAsString(newToDo))
+                .when()
+                .post("/todos")
+                .then().statusCode(200)
+                .body("description",equalTo("Example Description"),
+                        "name",equalTo("Example Name"))
+                .extract()
+                .as(ToDo.class);
+        assertThat(extractedToDo.getId(),equalTo(10001));
+                //"tasks",hasSize(1));
     }
 
 
 
     @Test
-    public void testGetTodos() throws JsonProcessingException {
-        given().contentType(ContentType.JSON)
-                .when().get("/todos")
-                .then()
-                .statusCode(200).assertThat()
-                //.body(is("[]"));
-                .body("", hasSize(0));
-        testCreate();
+    public void testGetToDos() throws JsonProcessingException {
+//        given().contentType(ContentType.JSON)
+//                .when().get("/todos")
+//                .then()
+//                .statusCode(200).assertThat()
+//                //.body(is("[]"));
+//                .body("", hasSize(0));
+        //testCreate();
         //testCreate(); when creating a second object it is autoIncrementing the Id as expected.
         given().contentType(ContentType.JSON)
                 .when().get("/todos")
                 .then()
                 .statusCode(200).assertThat()
                 .body("", hasSize(1))
-                .body("id",hasItem(1001),
+                .body("id",hasItem(1000),
                         "description",hasItem("Example Description"),
                         "name",hasItem("Example Name"));
     }
@@ -63,7 +91,7 @@ public class ToDoResourceTest {
 
     @Test
     public void testDelete() throws JsonProcessingException {
-        testCreate();
+        //testCreate();
         // How can I fetch the ID from the response and set it to the below id variable?
         //Long id = testCreate().response.body.id;
         //Long id = 1000L;
@@ -75,20 +103,24 @@ public class ToDoResourceTest {
                 .body(is("Deletion successful"));
     }
 
-    /*@Test
-    public void testDeleteJsonPath() throws JsonProcessingException {
-        testCreate();
-        Response response = (Response) given();
-        given().contentType(ContentType.JSON)
-                .when().delete("/todos/10")
-                .then();
-                //.body(is("Deletion successful"));
-        *//*.statusCode(404);*//*
-        *//* Fix after data loading then change status code to 200*//*
-        //JsonPath jp = new JsonPath("$.body",containsString("Deletion successful"));
-                    *//*JsonPath jp = new JsonPath(response.toString());
-                    System.out.println(jp);*//*
-                    *//*.statusCode(200)
-                    .body(ApiBody)*//*
-    }*/
+    // Fix test, returns 500 error
+    @Test
+    public void testUpdate() throws JsonProcessingException {
+        //testCreate();
+        ToDo updateToDo = new ToDo();
+        updateToDo.setName("Updated description");
+        updateToDo.setDescription("Updated name");
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
+                .body(mapper.writeValueAsString(updateToDo))
+                .when()
+                .put("/todos/1000")
+                .then()
+                //.statusCode(200)
+                .body("description",equalTo("Updated description"),
+                        "name",equalTo("Updated name"));
+    }
+
 }

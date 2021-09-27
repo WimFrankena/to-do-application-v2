@@ -1,14 +1,12 @@
 package org.acme;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
 @ApplicationScoped
 public class ToDoService {
-    @Inject
-    ToDoModel model;
+    private ToDoModel model = new ToDoModel();
 
 
     public ToDo createToDo(ToDo newToDo) {
@@ -24,11 +22,13 @@ public class ToDoService {
     public List<ToDo> getToDos() {
         return model.todos;
     }
+    public Integer countTodos() {
+        return getToDos().size();
+    }
 
     public Optional<ToDo> getToDo(Long id) {
-        Optional<ToDo> todoFound = getToDos().stream().filter(todo -> todo.getId().equals(id))
+        return getToDos().stream().filter(todo -> todo.getId().equals(id))
                 .findFirst();
-        return todoFound;
     }
 
     public ToDo updateToDo(Long id, ToDo toDoToBeUpdated) {
@@ -38,7 +38,7 @@ public class ToDoService {
             ToDo toDoToUpdate = updatedToDo.get();
             toDoToUpdate.setName(toDoToBeUpdated.getName());
             toDoToUpdate.setDescription(toDoToBeUpdated.getDescription());
-            toDoToUpdate.updateTasks(toDoToBeUpdated.getTasks());
+            toDoToUpdate.setTasks(toDoToBeUpdated.getTasks());
             returnUpdatedToDo = toDoToUpdate;
         }
         // Else return empty object which will fail the validation in the controller
@@ -48,10 +48,9 @@ public class ToDoService {
     public ToDo deleteToDo(Long id) {
         ToDo deletedToDo = new ToDo();
         Optional<ToDo> toDoToDelete = getToDo(id);
-        boolean removeToDo = false;
         if (toDoToDelete.isPresent()) {
             deletedToDo = toDoToDelete.get();
-            removeToDo = getToDos().remove(toDoToDelete.get());
+            getToDos().remove(toDoToDelete.get());
         }
         return deletedToDo;
     }

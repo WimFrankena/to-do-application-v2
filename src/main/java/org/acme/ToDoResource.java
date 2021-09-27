@@ -23,7 +23,7 @@ public class ToDoResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTodo(@PathParam("id") Long id) {
-        Optional todoFound = service.getToDo(id);
+        Optional<ToDo> todoFound = service.getToDo(id);
         if (todoFound.isPresent()) {
             return Response.ok(todoFound).build();
         }
@@ -35,7 +35,7 @@ public class ToDoResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/count")
     public Integer countTodos(){
-        return service.getToDos().size();
+        return service.countTodos();
     }
 
     @POST
