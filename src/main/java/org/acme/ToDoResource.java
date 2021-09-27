@@ -15,10 +15,8 @@ import java.util.stream.Collectors;
 
 @Path("/todos")
 public class ToDoResource {
-    ToDoService service = new ToDoService();
-    /*@Inject
-    ToDoService service;*/
-    // check for injection quarkus
+    @Inject
+    ToDoService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -32,7 +30,6 @@ public class ToDoResource {
     public Response getTodo(@PathParam("id") Long id) {
         Optional todoFound = service.getToDo(id);
         if (todoFound.isPresent()) {
-            // how to put this logic in the Service?
             return Response.ok(todoFound).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
@@ -51,7 +48,8 @@ public class ToDoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response createTodo(@Valid ToDo newTodo) {
         newTodo = service.createToDo(newTodo);
-        if(newTodo == null) {
+        if(newTodo.getId() == 0L) {
+            //If newToDo was not created in Model the ID will be null
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok(newTodo).build();
@@ -65,7 +63,7 @@ public class ToDoResource {
             @PathParam("id") Long id,
             ToDo toDoToBeUpdated) {
         ToDo toDoToUpdate = service.updateToDo(id, toDoToBeUpdated);
-        if (toDoToUpdate == null) {
+        if (toDoToUpdate.getId() == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok(toDoToUpdate).build();

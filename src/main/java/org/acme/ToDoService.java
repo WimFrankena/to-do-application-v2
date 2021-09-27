@@ -1,63 +1,58 @@
 package org.acme;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@ApplicationScoped
 public class ToDoService {
-    ToDoModel model = new ToDoModel();
-    /*@Inject
-    ToDoModel model;*/
-    // check for injection quarkus
+    @Inject
+    ToDoModel model;
 
 
-    public ToDo createToDo(ToDo newTodo) {
-        if(newTodo == null) {
-            return null;
+    public ToDo createToDo(ToDo newToDo) {
+        ToDo createdToDo = new ToDo();
+        newToDo.generateId();
+        if (model.add(newToDo)) {
+            // Only set the newToDo to the return value if it's created successfully
+            createdToDo = newToDo;
         }
-        // catch model exceptions here or elsewhere?
-        newTodo.generateId();
-        if(model.add(newTodo)) {
-            return newTodo;
-        }
-        return null;
+        return createdToDo;
     }
 
-    public List<ToDo> getToDos () {
+    public List<ToDo> getToDos() {
         return model.todos;
     }
 
     public Optional<ToDo> getToDo(Long id) {
         Optional<ToDo> todoFound = getToDos().stream().filter(todo -> todo.getId().equals(id))
                 .findFirst();
-        /*if (todoFound.isPresent()) {
-            return todoFound;
-        }*/
-        //return null;
         return todoFound;
     }
 
     public ToDo updateToDo(Long id, ToDo toDoToBeUpdated) {
+        ToDo returnUpdatedToDo = new ToDo();
         Optional<ToDo> updatedToDo = getToDos().stream().filter(todo -> id.equals(todo.getId())).findFirst();
-        if (updatedToDo.isEmpty()) {
-            return null;
+        if (updatedToDo.isPresent()) {
+            ToDo toDoToUpdate = updatedToDo.get();
+            toDoToUpdate.setName(toDoToBeUpdated.getName());
+            toDoToUpdate.setDescription(toDoToBeUpdated.getDescription());
+            toDoToUpdate.updateTasks(toDoToBeUpdated.getTasks());
+            returnUpdatedToDo = toDoToUpdate;
         }
-        ToDo toDoToUpdate = updatedToDo.get();
-        toDoToUpdate.setName(toDoToBeUpdated.getName());
-        toDoToUpdate.setDescription(toDoToBeUpdated.getDescription());
-        toDoToUpdate.setTasks(toDoToBeUpdated.getTasks());
-        // how should setTasks behave? Should you be allowed to overwrite? Create a separate endpoint for deleteTask?
-        return toDoToUpdate;
+        // Else return empty object which will fail the validation in the controller
+        return returnUpdatedToDo;
     }
 
     public Optional<ToDo> deleteToDo(Long id) {
-        Optional<ToDo> todoToDelete = getToDos().stream().filter(todo -> todo.getId().equals(id))
+        Optional<ToDo> toDoToDelete = getToDos().stream().filter(todo -> todo.getId().equals(id))
                 .findFirst();
-        boolean removed = false;
-        if (todoToDelete.isPresent()) {
-            removed = getToDos().remove(todoToDelete.get());
-            return todoToDelete;
+        boolean removeToDo = false;
+        if (toDoToDelete.isPresent()) {
+            removeToDo = getToDos().remove(toDoToDelete.get());
+            return toDoToDelete;
         }
         return null;
     }

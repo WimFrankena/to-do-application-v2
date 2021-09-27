@@ -1,5 +1,4 @@
 package org.acme;
-import org.gradle.internal.impldep.org.apache.commons.lang.ArrayUtils;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -16,16 +15,15 @@ public class ToDo {
     private Long id;
     @NotEmpty private String name;
     private String description;
-    private Task[] tasks;
-    //private List<Task> tasks;
+    private List<Task> tasks;
+    //private List<Task> tasks = new ArrayList<>();
+    // Is there a better way to do this?
 
-    public Task[] getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(Task[] tasks) {
-        this.tasks = (Task[])ArrayUtils.addAll(this.tasks, tasks);
-        // when converting to List, how to avoid the initial null list?
+    public void setTasks(List<Task> tasks) {
         /*if(!this.tasks.isEmpty()) {
             for(Task task:tasks) {
                 this.tasks.add(task);
@@ -34,6 +32,18 @@ public class ToDo {
             {
                 this.tasks = tasks;
             }*/
+        this.tasks = tasks;
+    }
+
+    public void updateTasks(List<Task> tasks) {
+        if(!this.tasks.isEmpty()) {
+            for(Task task:tasks) {
+                this.tasks.add(task);
+            }
+        } else
+            {
+                this.tasks = tasks;
+            }
     }
 
     public String getName() {
