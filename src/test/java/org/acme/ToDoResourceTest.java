@@ -22,9 +22,10 @@ public class ToDoResourceTest {
         // the .body part of the test fails in the later test instances because it's not equal to 1000 anymore
         // have to find a way to set this dynamically OR remove the body part of test when creating objects.
         ToDo newTodo = new ToDo();
-        //newTodo.setName("Example Name");
+        newTodo.setName("Example Name");
         newTodo.setDescription("Example Description");
-        newTodo.setId();
+        newTodo.generateId();
+        // create task(s)
         ObjectMapper mapper = new ObjectMapper();
         given().headers("Content-Type", ContentType.JSON, "Accept", ContentType.JSON)
                 .body(mapper.writeValueAsString(newTodo))
@@ -55,7 +56,7 @@ public class ToDoResourceTest {
                 .then()
                 .statusCode(200).assertThat()
                 .body("", hasSize(1))
-                .body("id",hasItem(1000),
+                .body("id",hasItem(1001),
                         "description",hasItem("Example Description"),
                         "name",hasItem("Example Name"));
     }

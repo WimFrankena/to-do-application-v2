@@ -3,6 +3,7 @@ package org.acme;
 
 import org.jboss.resteasy.annotations.Body;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -15,6 +16,8 @@ import java.util.stream.Collectors;
 @Path("/todos")
 public class ToDoResource {
     ToDoService service = new ToDoService();
+    /*@Inject
+    ToDoService service;*/
     // check for injection quarkus
 
     @GET
@@ -27,12 +30,11 @@ public class ToDoResource {
     @Path("{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getTodo(@PathParam("id") Long id) {
-        Optional<ToDo> todoFound = service.getToDos().stream().filter(todo -> todo.getId().equals(id))
-                .findFirst();
+        Optional todoFound = service.getToDo(id);
         if (todoFound.isPresent()) {
+            // how to put this logic in the Service?
             return Response.ok(todoFound).build();
         }
-        /*return Response.status(Response.Status.BAD_REQUEST).build();*/
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
@@ -62,14 +64,11 @@ public class ToDoResource {
     public Response updateTodo(
             @PathParam("id") Long id,
             ToDo toDoToBeUpdated) {
-        Optional<ToDo> updatedToDo = service.getToDos().stream().filter(todo -> id.equals(todo.getId())).findFirst();
-        if (updatedToDo.isEmpty())
-            return Response.status(Response.Status.NOT_FOUND).build();
-        ToDo updateToDo = updatedToDo.get();
-        updateToDo.setName(toDoToBeUpdated.getName());
-        updateToDo.setDescription(toDoToBeUpdated.getDescription());
-        updateToDo.setTasks(toDoToBeUpdated.getTasks());
-        return Response.ok(updateToDo).build();
+        ToDo toDoToUpdate = service.updateToDo(id, toDoToBeUpdated);
+        if (toDoToUpdate == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok(toDoToUpdate).build();
     }
 
 
@@ -78,15 +77,10 @@ public class ToDoResource {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response deleteTodo(
             @PathParam("id") Long id) {
-        Optional<ToDo> todoToDelete = service.getToDos().stream().filter(todo -> todo.getId().equals(id))
-                .findFirst();
-        boolean removed = false;
-        if (todoToDelete.isPresent()) {
-            removed = service.getToDos().remove(todoToDelete.get());
+        Optional<ToDo> toDoDeleted = service.deleteToDo(id);
+        if (toDoDeleted == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (removed) {
-            return Response.ok("Deletion successful").build();
-        }
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        return Response.ok("Deletion successful").build();
     }
 }

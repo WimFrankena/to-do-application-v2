@@ -56,7 +56,14 @@
       <artifactId>quarkus-hibernate-validator</artifactId>
       <version>2.2.1.Final</version>
     </dependency>
-
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-bootstrap-gradle-resolver</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
 
   </dependencies>
   <build>

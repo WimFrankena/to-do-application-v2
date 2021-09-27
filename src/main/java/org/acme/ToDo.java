@@ -1,6 +1,5 @@
 package org.acme;
 import org.gradle.internal.impldep.org.apache.commons.lang.ArrayUtils;
-
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -26,6 +25,7 @@ public class ToDo {
 
     public void setTasks(Task[] tasks) {
         this.tasks = (Task[])ArrayUtils.addAll(this.tasks, tasks);
+        // when converting to List, how to avoid the initial null list?
         /*if(!this.tasks.isEmpty()) {
             for(Task task:tasks) {
                 this.tasks.add(task);
@@ -58,7 +58,7 @@ public class ToDo {
         return id;
     }
 
-    public void setId() {
+    public void generateId() {
         id = ID_Generator.getAndIncrement();
         this.id = requireNonNull(id);
     }
