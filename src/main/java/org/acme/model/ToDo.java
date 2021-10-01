@@ -1,10 +1,10 @@
-package org.acme;
+package org.acme.model;
 
 import javax.validation.constraints.NotEmpty;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+
 
 public class ToDo {
 

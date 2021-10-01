@@ -1,0 +1,10 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:12
+    environment:
+      POSTGRES_USER: hibernate
+      POSTGRES_PASSWORD: hibernate
+      POSTGRES_DB: quarkus
+    ports:
+      - 5999:5432

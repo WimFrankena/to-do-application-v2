@@ -1,6 +1,9 @@
 package org.acme;
 
 
+import org.acme.model.Task;
+import org.acme.model.ToDo;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
@@ -11,7 +14,7 @@ import java.util.Optional;
 @Path("/todos")
 public class ToDoResource {
     @Inject
-    ToDoService service;
+    IToDoService service;
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -75,5 +78,27 @@ public class ToDoResource {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         return Response.ok("Deletion successful").build();
+    }
+
+
+    @GET
+    @Path("/tasks")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getTasks(){
+        return Response.ok(service.getTasks()).build();
+    }
+
+    @PUT
+    @Path("/tasks/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateTask(
+            @PathParam("id") Long id,
+            Task taskToBeUpdated ) {
+        Task taskToUpdate = service.updateTaskStatus(id, taskToBeUpdated );
+        if (taskToUpdate.getId() == null) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.ok(taskToUpdate).build();
     }
 }
